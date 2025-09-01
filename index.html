@@ -14,116 +14,12 @@
         <title-bar></title-bar>
 
         <!-- Directory Bar -->
-        <div class="directory-bar">
-            <div class="dirct-move">
-                <!-- Added home button -->
-                <i class="mdi mdi-home" title="Home"></i>
-                <i class="mdi mdi-arrow-left" title="Back"></i>
-                <i class="mdi mdi-arrow-right" title="Forward"></i>
-                <i class="mdi mdi-arrow-up" title="Up"></i>
-                <i class="mdi mdi-refresh" title="Refresh"></i>
-            </div>
-            <div class="dirct-path">
-                <div class="breadcrumb-path">
-                    <span>Home</span>
-                    <span>Documents</span>
-                    <span>Projects</span>
-                </div>
-                <!-- Replaced mdi-content-copy with mdi-clipboard-text -->
-                <i class="mdi mdi-clipboard-text" title="Copy Path"></i>
-            </div>
-            <div class="search-box">
-                <i class="mdi mdi-magnify"></i>
-                <input type="text" placeholder="Search files...">
-            </div>
-        </div>
+        <directory-bar></directory-bar>
 
         <!-- Content -->
         <div class="content">
             <!-- Directories/Trees Panel -->
-            <div class="directories-panel">
-                <details open class="card">
-                    <summary>
-                        <i class="mdi mdi-chevron-right"></i>
-                        <i class="mdi mdi-folder"></i>
-                        Main Directories
-                    </summary>
-                    <ul>
-                        <li><i class="mdi mdi-desktop-classic"></i>Desktop</li>
-                        <li><i class="mdi mdi-download"></i>Downloads</li>
-                        <li><i class="mdi mdi-file-document"></i>Documents</li>
-                        <li><i class="mdi mdi-image"></i>Images</li>
-                        <li><i class="mdi mdi-music"></i>Sounds</li>
-                        <li><i class="mdi mdi-video"></i>Videos</li>
-                        <!-- Added network location -->
-                        <li><i class="mdi mdi-lan"></i>Network</li>
-                    </ul>
-                </details>
-                
-                <details class="card">
-                    <summary>
-                        <i class="mdi mdi-chevron-right"></i>
-                        <i class="mdi mdi-star"></i>
-                        Favorites
-                    </summary>
-                    <ul>
-                        <li><i class="mdi mdi-folder-star"></i>Work</li>
-                        <li><i class="mdi mdi-folder-star"></i>Personal</li>
-                        <!-- Added favorite item -->
-                        <li><i class="mdi mdi-folder-star"></i>Projects</li>
-                    </ul>
-                </details>
-                
-                <div class="card">
-                    <h3>Storage Drives</h3>
-                    <div class="drivers-treemap">
-                        <div class="driver vertical" style="grid-area: c;">
-                            <i class="mdi mdi-harddisk"></i>
-                            C: (25%)
-                        </div>
-                        <div class="driver horizontal" style="grid-area: d;">
-                            <i class="mdi mdi-harddisk"></i>
-                            D: (50%)
-                        </div>
-                        <div class="driver vertical" style="grid-area: e;">
-                            <i class="mdi mdi-harddisk"></i>
-                            E: (15%)
-                        </div>
-                        <div class="driver vertical" style="grid-area: f;">
-                            <i class="mdi mdi-harddisk"></i>
-                            F: (10%)
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card cloud-card">
-                    <h3>Cloud Storage</h3>
-                    <div class="cloud-item">
-                        <!-- Replaced mdi-google-drive with more specific icon -->
-                        <i class="mdi mdi-google-drive"></i>
-                        Google Drive
-                        <div class="progress">
-                            <div class="progress-bar" style="width: 70%;"></div>
-                        </div>
-                    </div>
-                    <div class="cloud-item">
-                        <!-- Replaced mdi-onedrive with more specific icon -->
-                        <i class="mdi mdi-microsoft-onedrive"></i>
-                        OneDrive
-                        <div class="progress">
-                            <div class="progress-bar" style="width: 40%;"></div>
-                        </div>
-                    </div>
-                    <!-- Added Dropbox -->
-                    <div class="cloud-item">
-                        <i class="mdi mdi-dropbox"></i>
-                        Dropbox
-                        <div class="progress">
-                            <div class="progress-bar" style="width: 50%;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <directories-panel></directories-panel>
 
             <!-- Main Panel -->
             <div class="main-panel">
@@ -252,6 +148,8 @@
     </div>
 
     <script src="sections/title-bar/title-bar.js"></script>
+    <script src="/sections/directory-bar/directory-bar.js"></script>
+    <script src="sections/directories-panel/directories-panel.js"></script>
 
     <script>
         // Add some basic interactivity

@@ -1,0 +1,115 @@
+@import url('https://cdn.materialdesignicons.com/5.8.55/css/materialdesignicons.min.css');
+
+.directory-bar {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dirct-move, .dirct-path, .search-box {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  background: var(--hover-bg);
+  border-radius: 6px;
+  padding: 0 8px;
+}
+
+.dirct-move {
+  gap: 4px;
+}
+
+.dirct-move i {
+  font-size: 16px;
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  background: var(--card-bg);
+  height: 28px;
+  width: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.dirct-move i:hover {
+  background: var(--accent-color);
+  color: white;
+}
+
+.dirct-path {
+  flex: 1;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+
+.breadcrumb-path {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.breadcrumb-path span {
+  padding: 6px 12px;
+  background: var(--card-bg);
+  border-radius: 4px;
+  cursor: pointer;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.breadcrumb-path span:hover {
+  background: var(--accent-color);
+  color: white;
+}
+
+.dirct-path > i {
+  font-size: 16px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.dirct-path > i:hover {
+  background: var(--accent-color);
+  color: white;
+}
+
+.dirct-path > i.clip-text {
+  background: var(--card-bg);
+  color: #6c757d;
+}
+
+.dirct-path > i.clip-text:hover {
+  background: #28a745;
+  color: white;
+}
+
+.search-box {
+  gap: 8px;
+  padding: 0 12px;
+  min-width: 200px;
+}
+
+.search-box input {
+  border: none;
+  background: none;
+  outline: none;
+  color: var(--text-color);
+  flex: 1;
+  font-size: 14px;
+}
+
+.search-box input::placeholder {
+  color: #6c757d;
+}
+
+.search-box i {
+  font-size: 16px;
+  color: #6c757d;
+}

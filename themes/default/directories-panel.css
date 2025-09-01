@@ -1,0 +1,241 @@
+@import url('https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css');
+
+:host {
+  --bg-color: #f8f9fa;
+  --text-color: #212529;
+  --card-bg: #ffffff;
+  --border-color: #dee2e6;
+  --accent-color: #0d6efd;
+  --hover-bg: #e9ecef;
+  --shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: block;
+  width: 280px;
+  height: 100%;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.directories-panel {
+  margin: 0;
+  padding: 16px;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--card-bg);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  min-height: 100%;
+}
+
+.card {
+  background: var(--hover-bg);
+  border-radius: 8px;
+  margin: 0 0 16px 0;
+  padding: 16px;
+  border: 1px solid var(--border-color);
+  box-sizing: border-box;
+}
+
+.card h3 {
+  margin: 0 0 12px 0;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+details {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+details summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 4px 0;
+  list-style: none;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+details summary i {
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+details[open] summary i:first-child {
+  transform: rotate(90deg);
+}
+
+details ul {
+  list-style: none;
+  padding-left: 24px;
+  margin: 8px 0 0 0;
+  box-sizing: border-box;
+}
+
+details ul li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+details ul li:hover {
+  background: var(--accent-color);
+  color: white;
+}
+
+details ul li i {
+  font-size: 16px;
+  width: 16px;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.drivers-treemap {
+  display: grid;
+  grid-template:
+    "c d" 60px
+    "e f" 40px / 1fr 1.5fr;
+  gap: 8px;
+  margin: 12px 0 0 0;
+  padding: 0;
+  height: 108px;
+  box-sizing: border-box;
+}
+
+.driver {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.driver:hover {
+  background: var(--accent-color);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.driver.vertical {
+  flex-direction: column;
+  gap: 4px;
+}
+
+.driver.horizontal {
+  flex-direction: row;
+  gap: 6px;
+}
+
+.driver i {
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.cloud-card .cloud-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.cloud-card .cloud-item:hover {
+  background: var(--card-bg);
+  padding: 8px;
+  margin: 0 -8px;
+}
+
+.cloud-card .cloud-item i {
+  font-size: 18px;
+  width: 20px;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.cloud-card .progress {
+  flex: 1;
+  height: 6px;
+  background: var(--border-color);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.cloud-card .progress-bar {
+  height: 100%;
+  background: var(--accent-color);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--hover-bg);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}
