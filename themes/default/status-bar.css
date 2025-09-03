@@ -1,0 +1,72 @@
+@import url('https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css');
+
+.status-bar {
+  background: var(--card-bg);
+  border-top: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.status-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.status-group i {
+  font-size: 16px;
+}
+
+.status-group span {
+  display: inline-flex;
+  align-items: center;
+}
+
+.settings-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-group .zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settings-group .zoom-controls input {
+  width: 80px;
+  height: 24px;
+  margin: 0;
+}
+
+.settings-group .zoom-controls i,
+.settings-group .theme-switcher,
+.settings-group .settings {
+  font-size: 16px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+}
+
+.settings-group .theme-switcher:hover,
+.settings-group .settings:hover,
+.zoom-controls i:hover {
+  background: var(--accent-color);
+  color: white;
+}
+
+.settings-group .divider {
+  color: var(--border-color);
+  font-weight: 300;
+}

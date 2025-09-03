@@ -1,0 +1,89 @@
+/* Import MDI icons */
+@import url('https://cdn.materialdesignicons.com/5.9.55/css/materialdesignicons.min.css');
+
+/* Themeable styles for folder-contents */
+:host {
+  --bg-color: #f8f9fa;
+  --text-color: #212529;
+  --card-bg: #ffffff;
+  --border-color: #dee2e6;
+  --accent-color: #0d6efd;
+  --hover-bg: #e9ecef;
+  --shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+:host(.dark) {
+  --bg-color: #1a1a1a;
+  --text-color: #e9ecef;
+  --card-bg: #2d2d2d;
+  --border-color: #404040;
+  --accent-color: #0d6efd;
+  --hover-bg: #404040;
+  --shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Ensure global styles are applied within shadow DOM */
+:host * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.folder-contents {
+  background: var(--bg-color);
+  color: var(--text-color);
+  transition: all 0.3s ease;
+}
+
+/* File card styles (child component) */
+.file-card {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow);
+}
+
+.file-card:hover {
+  background: var(--accent-color);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.file-card .thumbnail {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.file-card .name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  word-break: break-all;
+  line-height: 1.2;
+}
+
+.file-card .name i {
+  font-size: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .file-card {
+    width: 80px;
+    height: 80px;
+  }
+}

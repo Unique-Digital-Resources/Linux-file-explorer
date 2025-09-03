@@ -23,126 +23,12 @@
 
             <!-- Main Panel -->
             <div class="main-panel">
-                <div class="toolbar">
-                    <div class="tool-group">
-                        <i class="mdi mdi-folder-plus" title="New Folder"></i>
-                        <i class="mdi mdi-file-plus" title="New File"></i>
-                        <!-- Added share icon -->
-                        <i class="mdi mdi-share-variant" title="Share"></i>
-                    </div>
-                    <div class="tool-group">
-                        <i class="mdi mdi-content-copy" title="Copy"></i>
-                        <i class="mdi mdi-content-cut" title="Cut"></i>
-                        <i class="mdi mdi-content-paste" title="Paste"></i>
-                        <i class="mdi mdi-rename-box" title="Rename"></i>
-                    </div>
-                    <div class="tool-group">
-                        <i class="mdi mdi-select-all" title="Select All"></i>
-                        <i class="mdi mdi-select-off" title="Deselect All"></i>
-                        <i class="mdi mdi-delete" title="Delete"></i>
-                        <!-- Added properties icon -->
-                        <i class="mdi mdi-information" title="Properties"></i>
-                    </div>
-                    <div class="tool-group">
-                        <!-- Replaced sort icons with more specific ones -->
-                        <i class="mdi mdi-sort-alphabetical-ascending" title="Sort by Name (A-Z)"></i>
-                        <i class="mdi mdi-sort-alphabetical-descending" title="Sort by Name (Z-A)"></i>
-                        <!-- Replaced view icons with more specific ones -->
-                        <i class="mdi mdi-view-grid" title="Grid View"></i>
-                        <i class="mdi mdi-view-list" title="List View"></i>
-                    </div>
-                </div>
+                <tool-bar></tool-bar>
                 
-                <div class="folder-contents">
-                    <div class="file-card">
-                        <i class="mdi mdi-folder thumbnail"></i>
-                        <div class="name">
-                            <i class="mdi mdi-folder"></i>
-                            <span>ProjectX</span>
-                        </div>
-                    </div>
-                    <div class="file-card">
-                        <i class="mdi mdi-image thumbnail"></i>
-                        <div class="name">
-                            <i class="mdi mdi-image"></i>
-                            <span>photo.jpg</span>
-                        </div>
-                    </div>
-                    <div class="file-card">
-                        <i class="mdi mdi-language-python thumbnail"></i>
-                        <div class="name">
-                            <i class="mdi mdi-language-python"></i>
-                            <span>script.py</span>
-                        </div>
-                    </div>
-                    <div class="file-card">
-                        <i class="mdi mdi-file-pdf-box thumbnail"></i>
-                        <div class="name">
-                            <i class="mdi mdi-file-pdf-box"></i>
-                            <span>document.pdf</span>
-                        </div>
-                    </div>
-                    <div class="file-card">
-                        <i class="mdi mdi-folder-zip thumbnail"></i>
-                        <div class="name">
-                            <i class="mdi mdi-folder-zip"></i>
-                            <span>Archive.zip</span>
-                        </div>
-                    </div>
-                    <div class="file-card">
-                        <i class="mdi mdi-microsoft-excel thumbnail"></i>
-                        <div class="name">
-                            <i class="mdi mdi-microsoft-excel"></i>
-                            <span>data.xlsx</span>
-                        </div>
-                    </div>
-                    <div class="file-card">
-                        <i class="mdi mdi-music thumbnail"></i>
-                        <div class="name">
-                            <i class="mdi mdi-music"></i>
-                            <span>song.mp3</span>
-                        </div>
-                    </div>
-                    <div class="file-card">
-                        <i class="mdi mdi-video thumbnail"></i>
-                        <div class="name">
-                            <i class="mdi mdi-video"></i>
-                            <span>video.mp4</span>
-                        </div>
-                    </div>
-                    <!-- Added new file type -->
-                    <div class="file-card">
-                        <i class="mdi mdi-file-word-box thumbnail"></i>
-                        <div class="name">
-                            <i class="mdi mdi-file-word-box"></i>
-                            <span>report.docx</span>
-                        </div>
-                    </div>
-                </div>
+                <folder-contents></folder-contents>
                 
-                <div class="status-bar">
-                    <div class="status-group">
-                        <!-- Added icon for file count -->
-                        <i class="mdi mdi-file-multiple"></i>
-                        <span>9 Files</span>
-                        <span>|</span>
-                        <span>photo.jpg (1.2 MB) selected</span>
-                    </div>
-                    <div class="settings-group">
-                        <div class="theme-switcher" onclick="document.body.classList.toggle('dark')" title="Toggle Theme">
-                            <i class="mdi mdi-theme-light-dark"></i>
-                        </div>
-                        <div class="settings" title="Settings">
-                            <i class="mdi mdi-cog"></i>
-                        </div>
-                        <span class="divider">|</span>
-                        <div class="zoom-controls">
-                            <i class="mdi mdi-magnify-minus" title="Zoom Out"></i>
-                            <input type="range" min="50" max="150" value="100" title="Zoom Level">
-                            <i class="mdi mdi-magnify-plus" title="Zoom In"></i>
-                        </div>
-                    </div>
-                </div>
+                <status-bar></status-bar>
+
             </div>
         </div>
     </div>
@@ -150,46 +36,9 @@
     <script src="sections/title-bar/title-bar.js"></script>
     <script src="/sections/directory-bar/directory-bar.js"></script>
     <script src="sections/directories-panel/directories-panel.js"></script>
+    <script src="sections/toolbar/toolbar.js"></script>
+    <script src="sections/folder-contents/folder-contents.js"></script>
+    <script src="sections/status-bar/status-bar.js"></script>
 
-    <script>
-        // Add some basic interactivity
-        document.addEventListener('DOMContentLoaded', function() {
-            // File card selection
-            const fileCards = document.querySelectorAll('.file-card');
-            fileCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    fileCards.forEach(c => c.style.outline = 'none');
-                    this.style.outline = '2px solid var(--accent-color)';
-                });
-            });
-
-            // Zoom functionality
-            const zoomRange = document.querySelector('input[type="range"]');
-            const folderContents = document.querySelector('.folder-contents');
-            
-            zoomRange.addEventListener('input', function() {
-                const scale = this.value / 100;
-                folderContents.style.transform = `scale(${scale})`;
-                folderContents.style.transformOrigin = 'top left';
-            });
-
-            // Zoom buttons
-            document.querySelector('.zoom-controls .mdi-magnify-minus').addEventListener('click', function() {
-                const currentValue = parseInt(zoomRange.value);
-                if (currentValue > 50) {
-                    zoomRange.value = currentValue - 10;
-                    zoomRange.dispatchEvent(new Event('input'));
-                }
-            });
-
-            document.querySelector('.zoom-controls .mdi-magnify-plus').addEventListener('click', function() {
-                const currentValue = parseInt(zoomRange.value);
-                if (currentValue < 150) {
-                    zoomRange.value = currentValue + 10;
-                    zoomRange.dispatchEvent(new Event('input'));
-                }
-            });
-        });
-    </script>
 </body>
 </html>
