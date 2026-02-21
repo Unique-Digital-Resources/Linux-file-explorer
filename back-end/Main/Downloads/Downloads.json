@@ -1,0 +1,10 @@
+{
+  "name": "Downloads",
+  "type": "folder",
+  "contents": [
+    { "name": "report.pdf", "type": "pdf" },
+    { "name": "software-installer.exe", "type": "executable" },
+    { "name": "image-set.zip", "type": "archive" },
+    { "name": "presentation.ppt", "type": "document" }
+  ]
+}

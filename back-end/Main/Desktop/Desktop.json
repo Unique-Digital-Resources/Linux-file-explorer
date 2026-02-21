@@ -1,0 +1,10 @@
+{
+  "name": "Desktop",
+  "type": "folder",
+  "contents": [
+    { "name": "notes.txt", "type": "text" },
+    { "name": "screenshot.png", "type": "image" },
+    { "name": "project-folder", "type": "folder" },
+    { "name": "todo-list.md", "type": "text" }
+  ]
+}

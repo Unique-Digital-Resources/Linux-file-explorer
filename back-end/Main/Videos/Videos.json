@@ -1,0 +1,10 @@
+{
+  "name": "Videos",
+  "type": "folder",
+  "contents": [
+    { "name": "tutorial.mp4", "type": "video" },
+    { "name": "presentation-recording.mov", "type": "video" },
+    { "name": "demo.webm", "type": "video" },
+    { "name": "home-videos", "type": "folder" }
+  ]
+}

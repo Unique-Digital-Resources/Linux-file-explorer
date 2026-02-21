@@ -1,0 +1,10 @@
+{
+  "name": "Documents",
+  "type": "folder",
+  "contents": [
+    { "name": "resume.docx", "type": "document" },
+    { "name": "budget.xlsx", "type": "spreadsheet" },
+    { "name": "notes.txt", "type": "text" },
+    { "name": "contract.pdf", "type": "pdf" }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Images",
+  "type": "folder",
+  "contents": [
+    { "name": "vacation-1.jpg", "type": "image" },
+    { "name": "vacation-2.png", "type": "image" },
+    { "name": "family-photo.jpeg", "type": "image" },
+    { "name": "wallpapers", "type": "folder" }
+  ]
+}

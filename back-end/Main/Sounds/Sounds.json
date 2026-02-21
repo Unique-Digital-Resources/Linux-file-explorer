@@ -1,0 +1,10 @@
+{
+  "name": "Sounds",
+  "type": "folder",
+  "contents": [
+    { "name": "song1.mp3", "type": "audio" },
+    { "name": "song2.wav", "type": "audio" },
+    { "name": "ringtone.m4a", "type": "audio" },
+    { "name": "podcast-episode.mp3", "type": "audio" }
+  ]
+}
