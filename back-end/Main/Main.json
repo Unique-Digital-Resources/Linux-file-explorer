@@ -1,0 +1,13 @@
+{
+  "name": "Main",
+  "type": "folder",
+  "contents": [
+    { "name": "Desktop", "type": "folder" },
+    { "name": "Downloads", "type": "folder" },
+    { "name": "Documents", "type": "folder" },
+    { "name": "Images", "type": "folder" },
+    { "name": "Sounds", "type": "folder" },
+    { "name": "Videos", "type": "folder" },
+    { "name": "Network", "type": "folder" }
+  ]
+}

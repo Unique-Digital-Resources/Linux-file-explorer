@@ -22,19 +22,73 @@
   box-shadow: var(--shadow);
 }
 
+/* Wrapper acts as the positioning context for the scrollbar */
+.tabs-wrapper {
+  position: relative;
+  background: var(--hover-bg);
+  border-top-right-radius: 15px;
+  border-top-left-radius: 15px;
+  overflow: hidden; /* Clips the scrollbar radius */
+  flex: 1;
+}
+
+/* The Scroll Container. Native scrollbar is hidden */
 .tabs {
   display: flex;
   gap: 0;
-  flex: 1;
   align-items: center;
   align-self: end;
-  background: var(--hover-bg);
   padding-bottom: 0;
   padding-right: 10px;
   padding-left: 10px;
-  border-top-right-radius: 15px;
-  border-top-left-radius: 15px;
-  overflow: hidden;
+  
+  /* Scroll behavior */
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+}
+
+.tabs::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Custom Scrollbar Overlay */
+.custom-scrollbar-track {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 12px; /* Hitbox for dragging */
+  background: transparent; 
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 100; /* Top layer */
+  pointer-events: auto;
+}
+
+/* Show scrollbar on hover or while dragging */
+.tabs-wrapper:hover .custom-scrollbar-track,
+.custom-scrollbar-track.dragging {
+  opacity: 1;
+}
+
+.scrollbar-thumb {
+  position: absolute;
+  top: 3px; /* Floating effect */
+  height: 6px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  cursor: grab;
+  transition: background 0.2s, height 0.2s, top 0.2s;
+}
+
+.scrollbar-thumb:hover, 
+.custom-scrollbar-track.dragging .scrollbar-thumb {
+  background: var(--accent-color);
+  height: 8px;
+  top: 2px;
+  cursor: grabbing;
 }
 
 .tab {

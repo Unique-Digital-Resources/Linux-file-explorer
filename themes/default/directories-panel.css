@@ -1,5 +1,6 @@
 @import url('https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css');
 
+/* Original Light Theme - with sidebar menu structural patterns */
 :host {
   --bg-color: #f8f9fa;
   --text-color: #212529;
@@ -9,7 +10,7 @@
   --hover-bg: #e9ecef;
   --shadow: 0 2px 4px rgba(0,0,0,0.1);
   display: block;
-  width: 280px;
+  width: 100%;
   height: 100%;
   overflow-y: auto;
   margin: 0;
@@ -17,38 +18,121 @@
   box-sizing: border-box;
 }
 
+/* Scroll container wrapper */
+.directories-panel-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+}
+
+/* Custom Scrollbar Overlay - on the LEFT side */
+.custom-scrollbar-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+  background: transparent;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 100;
+  pointer-events: auto;
+}
+
+/* Show scrollbar on hover or while dragging */
+.directories-panel-wrapper:hover .custom-scrollbar-track,
+.custom-scrollbar-track.dragging {
+  opacity: 1;
+}
+
+.scrollbar-thumb {
+  position: absolute;
+  left: 0;
+  width: 6px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  cursor: grab;
+  transition: background 0.2s;
+}
+
+.scrollbar-thumb:hover,
+.custom-scrollbar-track.dragging .scrollbar-thumb {
+  background: var(--accent-color);
+  cursor: grabbing;
+}
+
 .directories-panel {
   margin: 0;
-  padding: 16px;
+  padding: 12px;
+  padding-left: 16px; /* Extra padding for left scrollbar */
   box-sizing: border-box;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--card-bg);
-  border-right: 1px solid var(--border-color);
+  background: var(--bg-color);
   overflow-y: auto;
-  min-height: 100%;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
 }
 
+.directories-panel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Root list spacing - matching menu-root-list pattern */
+.directories-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Card styling - matching menu-panel structure */
 .card {
-  background: var(--hover-bg);
-  border-radius: 8px;
-  margin: 0 0 16px 0;
-  padding: 16px;
+  background: var(--card-bg);
   border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: visible;
+  transition: all 0.2s ease;
+  margin: 6px 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
+.card:hover {
+  border-color: #ced4da;
+}
+
+/* Card header - matching menu-panel-header structure */
 .card h3 {
-  margin: 0 0 12px 0;
-  padding: 0;
-  font-size: 14px;
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 13.5px;
   font-weight: 600;
   color: var(--text-color);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   box-sizing: border-box;
+  background: transparent;
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.2s ease;
 }
 
+.card h3:hover {
+  background: var(--hover-bg);
+}
+
+.card h3 i {
+  font-size: 17px;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+/* Details styling - matching menu-panel expandable structure */
 details {
   margin: 0;
   padding: 0;
@@ -59,48 +143,74 @@ details summary {
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-weight: 600;
-  font-size: 14px;
-  padding: 4px 0;
+  font-size: 13.5px;
+  padding: 12px 14px;
   list-style: none;
   margin: 0;
   box-sizing: border-box;
+  background: transparent;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.2s ease;
 }
 
 details summary::-webkit-details-marker {
   display: none;
 }
 
+details summary:hover {
+  background: var(--hover-bg);
+}
+
 details summary i {
-  font-size: 16px;
+  font-size: 17px;
+  opacity: 0.9;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+details summary i:first-child {
+  font-size: 15px;
+  transition: transform 0.2s ease;
 }
 
 details[open] summary i:first-child {
   transform: rotate(90deg);
 }
 
+details[open] summary {
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* List items - matching menu-panel-item structure */
 details ul {
   list-style: none;
-  padding-left: 24px;
-  margin: 8px 0 0 0;
+  padding: 8px;
+  margin: 0;
   box-sizing: border-box;
+  background: transparent;
 }
 
 details ul li {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
+  gap: 10px;
+  padding: 9px 14px;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 13px;
   transition: all 0.2s ease;
-  margin: 0;
+  margin: 2px 4px;
   box-sizing: border-box;
+  background: transparent;
+  color: #495057;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 details ul li:hover {
@@ -108,23 +218,39 @@ details ul li:hover {
   color: white;
 }
 
+details ul li.selected {
+  background: var(--accent-color);
+  color: white;
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+details ul li.selected i {
+  color: white;
+  opacity: 1;
+}
+
 details ul li i {
-  font-size: 16px;
-  width: 16px;
+  font-size: 15px;
+  width: 18px;
+  text-align: center;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  opacity: 0.8;
+  flex-shrink: 0;
 }
 
-.drivers-treemap {
+/* Drivers card - matching menu-panel-body structure */
+.drivers-card .drivers-treemap {
   display: grid;
   grid-template:
     "c d" 60px
     "e f" 40px / 1fr 1.5fr;
   gap: 8px;
-  margin: 12px 0 0 0;
-  padding: 0;
-  height: 108px;
+  margin: 0;
+  padding: 8px;
+  height: 116px;
   box-sizing: border-box;
 }
 
@@ -143,13 +269,19 @@ details ul li i {
   transition: all 0.2s ease;
   margin: 0;
   box-sizing: border-box;
+  color: #495057;
 }
 
 .driver:hover {
   background: var(--accent-color);
   color: white;
-  transform: translateY(-1px);
-  box-shadow: var(--shadow);
+  border-color: var(--accent-color);
+}
+
+.driver.selected {
+  background: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
 }
 
 .driver.vertical {
@@ -167,39 +299,62 @@ details ul li i {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  opacity: 0.8;
 }
 
+.driver.selected i {
+  color: white;
+  opacity: 1;
+}
+
+/* Cloud card - matching menu-panel-item structure */
 .cloud-card .cloud-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 0;
+  gap: 10px;
+  padding: 9px 14px;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 6px;
   transition: all 0.2s ease;
-  margin: 0;
+  margin: 2px 4px;
   box-sizing: border-box;
+  background: transparent;
+  color: #495057;
+  font-size: 13px;
 }
 
 .cloud-card .cloud-item:hover {
-  background: var(--card-bg);
-  padding: 8px;
-  margin: 0 -8px;
+  background: var(--hover-bg);
+  color: var(--text-color);
+}
+
+.cloud-card .cloud-item.selected {
+  background: var(--accent-color);
+  color: white;
+  font-weight: 500;
 }
 
 .cloud-card .cloud-item i {
-  font-size: 18px;
-  width: 20px;
+  font-size: 15px;
+  width: 18px;
+  text-align: center;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.cloud-card .cloud-item.selected i {
+  color: white;
+  opacity: 1;
 }
 
 .cloud-card .progress {
   flex: 1;
-  height: 6px;
+  height: 4px;
   background: var(--border-color);
-  border-radius: 3px;
+  border-radius: 2px;
   overflow: hidden;
   margin: 0;
   padding: 0;
@@ -209,33 +364,137 @@ details ul li i {
 .cloud-card .progress-bar {
   height: 100%;
   background: var(--accent-color);
-  border-radius: 3px;
+  border-radius: 2px;
   transition: width 0.3s ease;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
+/* Menu Panel structural classes - matching sidebar_menu.css pattern */
+.menu-panel {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: visible;
+  transition: all 0.2s ease;
+  margin: 6px 0;
 }
 
-::-webkit-scrollbar-track {
+.menu-panel:hover {
+  border-color: #ced4da;
+}
+
+.menu-panel-header {
+  padding: 12px 14px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 13.5px;
+  color: var(--text-color);
+  transition: all 0.2s ease;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+}
+
+.menu-panel-header:hover {
   background: var(--hover-bg);
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-::-webkit-scrollbar-thumb:hover {
+.menu-panel-header.selected {
   background: var(--accent-color);
+  color: white;
+  border-radius: 8px;
+  border-bottom: none;
+  margin: 4px;
+  padding: 10px 12px;
+}
+
+.menu-panel-header.selected .menu-panel-icon,
+.menu-panel-header.selected .menu-panel-chevron {
+  color: white;
+  opacity: 1;
+}
+
+.menu-panel-icon {
+  font-size: 17px;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.menu-panel-title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.menu-panel-chevron {
+  font-size: 15px;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.menu-panel-body {
+  padding: 8px;
+  background: transparent;
+}
+
+/* Menu Panel Items */
+.menu-panel-item {
+  padding: 9px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #495057;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+  background: transparent;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 6px;
+  margin: 2px 4px;
+}
+
+.menu-panel-item:hover {
+  background: var(--accent-color);
+  color: white;
+}
+
+.menu-panel-item.selected {
+  background: var(--accent-color);
+  color: white;
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+.menu-panel-item.selected .menu-panel-item-icon {
+  color: white;
+  opacity: 1;
+}
+
+.menu-panel-item-icon {
+  font-size: 15px;
+  opacity: 0.8;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.menu-panel-item-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }

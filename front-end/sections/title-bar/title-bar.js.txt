@@ -1,0 +1,189 @@
+class TitleBar extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.draggedTab = null;
+    this.draggedIndex = null;
+    this.dragIndicator = null;
+
+    // Create the component structure
+    this.shadowRoot.innerHTML = `
+      <link rel="stylesheet" href="/themes/default/title-bar.css">
+      <div class="title-bar">
+        <div class="tabs">
+          <div class="tab" draggable="true" data-index="0">
+            <i class="mdi mdi-folder-outline"></i>
+            <span>Documents</span>
+            <i class="mdi mdi-close close"></i>
+          </div>
+          <div class="tab" draggable="true" data-index="1">
+            <i class="mdi mdi-folder-outline"></i>
+            <span>Downloads</span>
+            <i class="mdi mdi-close close"></i>
+          </div>
+        </div>
+        <div class="avatars">
+          <div class="avatar"></div>
+          <div class="avatar"></div>
+          <div class="avatar owner-avatar"></div>
+        </div>
+        <div class="main-buttons">
+          <i class="mdi mdi-window-minimize"></i>
+          <i class="mdi mdi-window-maximize"></i>
+          <i class="mdi mdi-close close"></i>
+        </div>
+      </div>
+    `;
+
+    // Set component-specific styles (dimensions)
+    const style = document.createElement('style');
+    style.textContent = `
+      .title-bar {
+        width: 100%;
+        height: 50px;
+      }
+    `;
+    this.shadowRoot.appendChild(style);
+
+    // Initialize tabs
+    this.initTabs();
+  }
+
+  initTabs() {
+    const tabs = this.shadowRoot.querySelectorAll('.tab');
+    const tabsContainer = this.shadowRoot.querySelector('.tabs');
+
+    // Update tab styles (first/last/only)
+    this.updateTabStyles();
+
+    // Add drag and drop event listeners
+    tabs.forEach((tab, index) => {
+      // Drag start
+      tab.addEventListener('dragstart', (e) => {
+        this.draggedTab = tab;
+        this.draggedIndex = index;
+        
+        // Hide the dragged tab
+        tab.style.opacity = '0';
+        tab.style.visibility = 'hidden';
+        
+        // Create drag indicator
+        this.createDragIndicator();
+        
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', tab.innerHTML);
+      });
+
+      // Drag end
+      tab.addEventListener('dragend', () => {
+        // Show the dragged tab
+        tab.style.opacity = '1';
+        tab.style.visibility = 'visible';
+        
+        // Remove drag indicator
+        this.removeDragIndicator();
+        
+        this.draggedTab = null;
+        this.draggedIndex = null;
+        this.updateTabStyles();
+      });
+
+      // Drag over
+      tab.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        
+        if (this.draggedTab && this.draggedTab !== tab) {
+          const rect = tab.getBoundingClientRect();
+          const midX = rect.left + rect.width / 2;
+          
+          // Move indicator to show drop position
+          if (e.clientX < midX) {
+            tabsContainer.insertBefore(this.dragIndicator, tab);
+          } else {
+            tabsContainer.insertBefore(this.dragIndicator, tab.nextSibling);
+          }
+        }
+      });
+
+      // Drop
+      tab.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (this.draggedTab && this.draggedTab !== tab) {
+          const rect = tab.getBoundingClientRect();
+          const midX = rect.left + rect.width / 2;
+          
+          // Move the dragged tab to the new position
+          if (e.clientX < midX) {
+            tabsContainer.insertBefore(this.draggedTab, tab);
+          } else {
+            tabsContainer.insertBefore(this.draggedTab, tab.nextSibling);
+          }
+          
+          this.updateTabStyles();
+        }
+      });
+
+      // Close button click
+      const closeBtn = tab.querySelector('.close');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          tab.remove();
+          this.updateTabStyles();
+        });
+      }
+    });
+  }
+
+  createDragIndicator() {
+    if (this.dragIndicator) return;
+    
+    this.dragIndicator = document.createElement('div');
+    this.dragIndicator.className = 'drag-indicator';
+    this.shadowRoot.querySelector('.tabs').appendChild(this.dragIndicator);
+  }
+
+  removeDragIndicator() {
+    if (this.dragIndicator) {
+      this.dragIndicator.remove();
+      this.dragIndicator = null;
+    }
+  }
+
+  updateTabStyles() {
+    const tabs = this.shadowRoot.querySelectorAll('.tab');
+    
+    tabs.forEach((tab, index) => {
+      // Remove all position classes
+      tab.classList.remove('first', 'last', 'only');
+      
+      // Add appropriate position class
+      if (tabs.length === 1) {
+        tab.classList.add('only');
+        // Hide close button for single tab
+        const closeBtn = tab.querySelector('.close');
+        if (closeBtn) {
+          closeBtn.style.display = 'none';
+        }
+      } else {
+        if (index === 0) {
+          tab.classList.add('first');
+        }
+        if (index === tabs.length - 1) {
+          tab.classList.add('last');
+        }
+        // Show close button for multiple tabs
+        const closeBtn = tab.querySelector('.close');
+        if (closeBtn) {
+          closeBtn.style.display = 'block';
+        }
+      }
+      
+      // Update data-index attribute
+      tab.setAttribute('data-index', index);
+    });
+  }
+}
+
+customElements.define('title-bar', TitleBar);

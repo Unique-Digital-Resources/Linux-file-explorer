@@ -14,14 +14,16 @@
   padding: 0 8px;
 }
 
+/* Navigation move container */
 .dirct-move {
-  gap: 4px;
+  gap: 0;
+  padding: 3px;
 }
 
+/* Navigation move items - connected with no gaps */
 .dirct-move i {
   font-size: 16px;
   padding: 6px;
-  border-radius: 4px;
   cursor: pointer;
   background: var(--card-bg);
   height: 28px;
@@ -30,11 +32,36 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  position: relative;
+  border-right: 1px solid var(--border-color);
 }
 
+/* First item - rounded left corners */
+.dirct-move i:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+/* Last item - rounded right corners */
+.dirct-move i:last-child {
+  border-radius: 0 4px 4px 0;
+  border-right: none;
+}
+
+/* Single item - fully rounded */
+.dirct-move i:only-child {
+  border-radius: 4px;
+  border-right: none;
+}
+
+/* Hover state */
 .dirct-move i:hover {
   background: var(--accent-color);
   color: white;
+  border-right-color: var(--accent-color);
+}
+
+.dirct-move i:hover + i {
+  border-left-color: var(--accent-color);
 }
 
 .dirct-path {
@@ -45,14 +72,14 @@
 
 .breadcrumb-path {
   display: flex;
-  gap: 6px;
+  gap: 0;
   align-items: center;
 }
 
+/* Breadcrumb items - connected with no gaps */
 .breadcrumb-path span {
-  padding: 6px 12px;
+  padding: 6px 14px;
   background: var(--card-bg);
-  border-radius: 4px;
   cursor: pointer;
   height: 28px;
   display: flex;
@@ -60,9 +87,40 @@
   font-size: 13px;
   font-weight: 500;
   transition: all 0.2s ease;
+  position: relative;
+  border-right: 1px solid var(--border-color);
 }
 
+/* First item - rounded left corners */
+.breadcrumb-path span:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+/* Last item - rounded right corners */
+.breadcrumb-path span:last-child {
+  border-radius: 0 6px 6px 0;
+  border-right: none;
+}
+
+/* Single item - fully rounded */
+.breadcrumb-path span:only-child {
+  border-radius: 6px;
+  border-right: none;
+}
+
+/* Hover state for breadcrumb items */
 .breadcrumb-path span:hover {
+  background: var(--accent-color);
+  color: white;
+  border-right-color: var(--accent-color);
+}
+
+.breadcrumb-path span:hover + span {
+  border-left-color: var(--accent-color);
+}
+
+/* Active/selected state */
+.breadcrumb-path span.active {
   background: var(--accent-color);
   color: white;
 }

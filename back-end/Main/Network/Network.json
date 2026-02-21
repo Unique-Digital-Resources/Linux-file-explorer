@@ -1,0 +1,9 @@
+{
+  "name": "Network",
+  "type": "folder",
+  "contents": [
+    { "name": "shared-drive-1", "type": "folder" },
+    { "name": "shared-drive-2", "type": "folder" },
+    { "name": "printer-config", "type": "folder" }
+  ]
+}

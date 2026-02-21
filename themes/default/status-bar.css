@@ -66,7 +66,155 @@
   color: white;
 }
 
+.settings-group .settings.active {
+  background: var(--accent-color);
+  color: white;
+}
+
 .settings-group .divider {
   color: var(--border-color);
   font-weight: 300;
+}
+
+/* Quick Settings Drop-up Box */
+.quick-settings {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: 280px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.2s ease;
+  z-index: 1000;
+}
+
+.quick-settings.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.quick-settings::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  right: 20px;
+  width: 12px;
+  height: 12px;
+  background: var(--card-bg);
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  transform: rotate(45deg);
+}
+
+.quick-settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.quick-settings-header .close-btn {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+  color: var(--text-color);
+}
+
+.quick-settings-header .close-btn:hover {
+  background: var(--hover-bg);
+}
+
+.quick-settings-content {
+  padding: 12px 16px;
+}
+
+.setting-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.setting-item:not(:last-child) {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.setting-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.setting-label i {
+  font-size: 16px;
+  color: var(--accent-color);
+}
+
+.setting-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.setting-control input[type="range"] {
+  flex: 1;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--hover-bg);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.setting-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.setting-control input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.setting-control input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--accent-color);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.setting-control input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.2);
+}
+
+.setting-value {
+  min-width: 45px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-color);
+  font-family: monospace;
 }
