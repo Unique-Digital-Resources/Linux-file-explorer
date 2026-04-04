@@ -9,11 +9,18 @@ class FileCard extends HTMLElement {
 
   connectedCallback() {
     const icon = this.getAttribute('icon') || 'mdi-file';
-    const name = this.getAttribute('name') || 'Unknown File';
+    const fullName = this.getAttribute('name') || 'Unknown File';
     const thumbnail = this.getAttribute('thumbnail');
 
-    // Determine if this is a visual card
     const isVisual = !!thumbnail;
+    
+    const lastDotIndex = fullName.lastIndexOf('.');
+    let fileName = fullName;
+    let fileExt = '';
+    if (lastDotIndex > 0) {
+      fileName = fullName.substring(0, lastDotIndex);
+      fileExt = fullName.substring(lastDotIndex);
+    }
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -21,6 +28,14 @@ class FileCard extends HTMLElement {
           display: block;
           width: 100%;
           height: 100%;
+        }
+        .file-card.selected {
+          outline: 2px solid var(--accent-color, #0d6efd);
+          outline-offset: -2px;
+          background-color: rgba(13, 110, 253, 0.1);
+        }
+        .file-card.selected.is-visual {
+          box-shadow: inset 0 0 0 3px var(--accent-color, #0d6efd);
         }
       </style>
       <link rel="stylesheet" href="../../themes/default/file-card.css">
@@ -30,7 +45,7 @@ class FileCard extends HTMLElement {
         </div>
         <div class="name">
           <i class="mdi ${icon}"></i>
-          <span>${name}</span>
+          <span class="filename">${fileName}</span><span class="fileext">${fileExt}</span>
         </div>
       </div>
     `;
@@ -40,6 +55,29 @@ class FileCard extends HTMLElement {
       const card = this.shadowRoot.querySelector('.file-card');
       card.style.backgroundImage = `url('${thumbnail}')`;
     }
+
+    // Check for selected attribute
+    if (this.hasAttribute('selected')) {
+      const card = this.shadowRoot.querySelector('.file-card');
+      if (card) card.classList.add('selected');
+    }
+
+    // Watch for attribute changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'selected') {
+          const card = this.shadowRoot.querySelector('.file-card');
+          if (card) {
+            if (this.hasAttribute('selected')) {
+              card.classList.add('selected');
+            } else {
+              card.classList.remove('selected');
+            }
+          }
+        }
+      });
+    });
+    observer.observe(this, { attributes: true });
 
     // Listen for font size changes
     window.addEventListener('font-size-changed', (e) => {

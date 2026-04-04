@@ -1,58 +1,463 @@
 class DirectoryBar extends HTMLElement {
-    constructor() {
-      super();
-      this.attachShadow({ mode: 'open' });
-  
-      // Create the component's DOM
-      this.shadowRoot.innerHTML = `
-        <link rel="stylesheet" href="/themes/default/directory-bar.css">
-        <div class="directory-bar">
-          <div class="dirct-move">
-            <i class="mdi mdi-home"></i>
-            <i class="mdi mdi-arrow-left"></i>
-            <i class="mdi mdi-arrow-right"></i>
-            <i class="mdi mdi-arrow-up"></i>
-            <i class="mdi mdi-refresh"></i>
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.currentPath = '/';
+
+    this.shadowRoot.innerHTML = `
+      <link rel="stylesheet" href="/themes/default/directory-bar.css">
+      <div class="directory-bar">
+        <div class="dirct-move">
+          <i class="mdi mdi-home" title="Home"></i>
+          <i class="mdi mdi-arrow-left" title="Back"></i>
+          <i class="mdi mdi-arrow-right" title="Forward"></i>
+          <i class="mdi mdi-arrow-up" title="Up"></i>
+          <i class="mdi mdi-refresh" title="Refresh"></i>
+        </div>
+        <div class="dirct-path" id="dir-path">
+          <div class="breadcrumb-path" id="breadcrumb">
+            <span>/</span>
           </div>
-          <div class="dirct-path">
-            <div class="breadcrumb-path">
-              <span>Home</span>
-              <span>Documents</span>
-              <span>Projects</span>
-            </div>
-            <i class="mdi mdi-folder-plus clip-text" title="Copy folder path"></i>
-          </div>
-          <div class="search-box">
-            <i class="mdi mdi-magnify"></i>
-            <input type="text" placeholder="Search">
-          </div>
+          <input type="text" class="path-edit-input" id="path-edit-input" spellcheck="false">
+          <i class="mdi mdi-folder-plus clip-text" title="Copy folder path"></i>
+        </div>
+        <div class="search-box">
+          <i class="mdi mdi-magnify" id="search-icon"></i>
+          <input type="text" placeholder="Search" id="search-input">
+        </div>
+        <div class="search-results" id="search-results" hidden></div>
+      </div>
+    `;
+
+    const style = document.createElement('style');
+    style.textContent = `
+      :host {
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      .directory-bar {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        gap: 12px;
+        height: 50px;
+        width: 100%;
+        box-sizing: border-box;
+        position: relative;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      .search-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--card-bg, white);
+        border: 1px solid var(--border-color, #ccc);
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 1000;
+        margin-top: 2px;
+      }
+      .search-result-item {
+        padding: 8px 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-color, #333);
+      }
+      .search-result-item:hover {
+        background: var(--hover-bg, #f0f0f0);
+      }
+      .search-result-item i {
+        font-size: 16px;
+        flex-shrink: 0;
+      }
+      .search-result-item .result-info {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .search-result-item .result-name {
+        font-weight: 500;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .search-result-item .result-path {
+        font-size: 11px;
+        opacity: 0.6;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .no-results {
+        padding: 12px;
+        text-align: center;
+        color: var(--text-color, #666);
+        opacity: 0.6;
+        font-size: 13px;
+      }
+      .dirct-move i.disabled {
+        opacity: 0.3;
+        pointer-events: none;
+        cursor: default;
+      }
+      .path-edit-input {
+        display: none;
+        flex: 1;
+        border: 1px solid var(--border-color, #ccc);
+        border-radius: 3px;
+        padding: 2px 6px;
+        font-size: 13px;
+        font-family: inherit;
+        background: var(--card-bg, white);
+        color: var(--text-color, #333);
+        outline: none;
+      }
+      .path-edit-input:focus {
+        border-color: var(--accent-color, #4a90d9);
+      }
+      .path-edit-mode .breadcrumb-path {
+        display: none;
+      }
+      .path-edit-mode .clip-text {
+        display: none;
+      }
+      .path-edit-mode .path-edit-input {
+        display: block;
+      }
+      .path-edit-mode.path-error .path-edit-input {
+        border-color: #e74c3c;
+      }
+    `;
+    this.shadowRoot.appendChild(style);
+
+    this.initNavigation();
+    this.initSearch();
+    this.initPathListener();
+    this.initPathEdit();
+  }
+
+  initNavigation() {
+    const homeBtn = this.shadowRoot.querySelector('.mdi-home');
+    const backBtn = this.shadowRoot.querySelector('.mdi-arrow-left');
+    const forwardBtn = this.shadowRoot.querySelector('.mdi-arrow-right');
+    const upBtn = this.shadowRoot.querySelector('.mdi-arrow-up');
+    const refreshBtn = this.shadowRoot.querySelector('.mdi-refresh');
+
+    this.backBtn = backBtn;
+    this.forwardBtn = forwardBtn;
+    this.upBtn = upBtn;
+
+    homeBtn?.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('tab-go-home'));
+    });
+
+    backBtn?.addEventListener('click', () => {
+      if (!backBtn.classList.contains('disabled')) {
+        window.dispatchEvent(new CustomEvent('tab-back'));
+      }
+    });
+
+    forwardBtn?.addEventListener('click', () => {
+      if (!forwardBtn.classList.contains('disabled')) {
+        window.dispatchEvent(new CustomEvent('tab-forward'));
+      }
+    });
+
+    upBtn?.addEventListener('click', () => {
+      if (!upBtn.classList.contains('disabled')) {
+        this.navigateUp();
+      }
+    });
+
+    refreshBtn?.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('navigate-to-path', {
+        detail: { path: this.currentPath }
+      }));
+    });
+  }
+
+  initSearch() {
+    const searchInput = this.shadowRoot.getElementById('search-input');
+    const searchIcon = this.shadowRoot.getElementById('search-icon');
+    const searchResults = this.shadowRoot.getElementById('search-results');
+
+    const performSearch = () => {
+      const query = searchInput.value.trim();
+      if (query.length < 1) {
+        searchResults.hidden = true;
+        return;
+      }
+      if (typeof window.SimulationAPI?.searchFiles === 'function') {
+        const results = window.SimulationAPI.searchFiles(query, this.currentPath);
+        this.renderSearchResults(results);
+      }
+    };
+
+    searchIcon?.addEventListener('click', performSearch);
+
+    searchInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        performSearch();
+      } else if (e.key === 'Escape') {
+        searchResults.hidden = true;
+      }
+    });
+
+    searchInput?.addEventListener('input', () => {
+      if (searchInput.value.trim() === '') {
+        searchResults.hidden = true;
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!this.shadowRoot.contains(e.target)) {
+        searchResults.hidden = true;
+      }
+    });
+  }
+
+  renderSearchResults(results) {
+    const searchResults = this.shadowRoot.getElementById('search-results');
+    searchResults.innerHTML = '';
+
+    if (!results || results.length === 0) {
+      searchResults.innerHTML = '<div class="no-results">No results found</div>';
+      searchResults.hidden = false;
+      return;
+    }
+
+    results.forEach((result) => {
+      const item = document.createElement('div');
+      item.className = 'search-result-item';
+
+      const iconClass = result.type === 'folder' ? 'mdi-folder' : 'mdi-file-document';
+      const parentPath = result.path.substring(0, result.path.lastIndexOf('/')) || '/';
+
+      item.innerHTML = `
+        <i class="mdi ${iconClass}"></i>
+        <div class="result-info">
+          <span class="result-name">${result.name}</span>
+          <span class="result-path">${result.path}</span>
         </div>
       `;
-  
-      // Set encapsulated layout styles and inherited properties
-      const style = document.createElement('style');
-      style.textContent = `
-        :host {
-          box-sizing: border-box;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+      item.addEventListener('click', () => {
+        searchResults.hidden = true;
+        this.navigateTo(parentPath);
+      });
+
+      searchResults.appendChild(item);
+    });
+
+    searchResults.hidden = false;
+  }
+
+  initPathListener() {
+    window.addEventListener('path-changed', (e) => {
+      this.currentPath = e.detail.path;
+      this.updateBreadcrumb(e.detail.path, e.detail.name);
+    });
+
+    window.addEventListener('navigation-state-changed', (e) => {
+      this.updateNavigationState(e.detail);
+    });
+  }
+
+  initPathEdit() {
+    const dirPath = this.shadowRoot.getElementById('dir-path');
+    const breadcrumb = this.shadowRoot.getElementById('breadcrumb');
+    const pathInput = this.shadowRoot.getElementById('path-edit-input');
+
+    if (!dirPath || !breadcrumb || !pathInput) return;
+
+    breadcrumb.addEventListener('dblclick', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.enterPathEditMode();
+    });
+
+    dirPath.addEventListener('click', (e) => {
+      if (e.target === dirPath) {
+        this.enterPathEditMode();
+      }
+    });
+
+    pathInput.addEventListener('blur', (e) => {
+      setTimeout(() => {
+        if (dirPath.classList.contains('path-edit-mode')) {
+          this.exitPathEditMode(false);
         }
-        .directory-bar {
-          display: flex;
-          align-items: center;
-          padding: 8px 12px;
-          gap: 12px;
-          height: 50px;
-          width: 100%;
-          box-sizing: border-box;
+      }, 150);
+    });
+
+    pathInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const newPath = pathInput.value.trim();
+        if (newPath) {
+          this.validateAndNavigate(newPath);
         }
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-      `;
-      this.shadowRoot.appendChild(style);
+      } else if (e.key === 'Escape') {
+        this.exitPathEditMode(false);
+      }
+    });
+  }
+
+  enterPathEditMode() {
+    const dirPath = this.shadowRoot.getElementById('dir-path');
+    const pathInput = this.shadowRoot.getElementById('path-edit-input');
+    
+    dirPath.classList.add('path-edit-mode');
+    pathInput.value = this.currentPath;
+    pathInput.focus();
+    pathInput.select();
+  }
+
+  exitPathEditMode(navigate = false) {
+    const dirPath = this.shadowRoot.getElementById('dir-path');
+    const pathInput = this.shadowRoot.getElementById('path-edit-input');
+    
+    dirPath.classList.remove('path-edit-mode');
+    dirPath.classList.remove('path-error');
+    pathInput.value = '';
+  }
+
+  validateAndNavigate(path) {
+    let normalizedPath = path.trim();
+    
+    if (!normalizedPath.startsWith('/')) {
+      normalizedPath = '/' + normalizedPath;
+    }
+    
+    if (normalizedPath.length > 1 && normalizedPath.endsWith('/')) {
+      normalizedPath = normalizedPath.slice(0, -1);
+    }
+
+    if (typeof window.SimulationAPI?.pathExists === 'function') {
+      const exists = window.SimulationAPI.pathExists(normalizedPath);
+      const isFolder = window.SimulationAPI.isFolder(normalizedPath);
+      
+      if (exists && isFolder) {
+        this.exitPathEditMode(true);
+        this.navigateTo(normalizedPath);
+      } else {
+        this.showPathError();
+      }
+    } else {
+      this.exitPathEditMode(true);
+      this.navigateTo(normalizedPath);
     }
   }
-  
-  customElements.define('directory-bar', DirectoryBar);
+
+  showPathError() {
+    const dirPath = this.shadowRoot.getElementById('dir-path');
+    const pathInput = this.shadowRoot.getElementById('path-edit-input');
+    
+    dirPath.classList.add('path-error');
+    pathInput.value = '';
+    pathInput.placeholder = 'Invalid path!';
+    
+    setTimeout(() => {
+      if (dirPath.classList.contains('path-error')) {
+        dirPath.classList.remove('path-error');
+        pathInput.placeholder = '';
+        pathInput.focus();
+      }
+    }, 3000);
+  }
+
+  updateNavigationState(detail) {
+    const { canBack, canForward, currentPath } = detail;
+    
+    if (this.backBtn) {
+      if (canBack) {
+        this.backBtn.classList.remove('disabled');
+        this.backBtn.title = 'Back';
+      } else {
+        this.backBtn.classList.add('disabled');
+        this.backBtn.title = 'Back (no history)';
+      }
+    }
+    
+    if (this.forwardBtn) {
+      if (canForward) {
+        this.forwardBtn.classList.remove('disabled');
+        this.forwardBtn.title = 'Forward';
+      } else {
+        this.forwardBtn.classList.add('disabled');
+        this.forwardBtn.title = 'Forward (no history)';
+      }
+    }
+    
+    if (this.upBtn) {
+      if (currentPath === '/' || !currentPath) {
+        this.upBtn.classList.add('disabled');
+        this.upBtn.title = 'Up (at root)';
+      } else {
+        this.upBtn.classList.remove('disabled');
+        this.upBtn.title = 'Up';
+      }
+    }
+  }
+
+  updateBreadcrumb(path, name) {
+    const breadcrumb = this.shadowRoot.getElementById('breadcrumb');
+    if (!breadcrumb) return;
+
+    if (path === '/') {
+      breadcrumb.innerHTML = '<span>/</span>';
+      return;
+    }
+
+    const parts = path.split('/').filter(p => p);
+    let html = '<span data-path="/">/</span>';
+
+    let currentPath = '';
+    parts.forEach((part, index) => {
+      currentPath += '/' + part;
+      const isLast = index === parts.length - 1;
+      if (isLast) {
+        html += `<span>${part}</span>`;
+      } else {
+        html += `<span data-path="${currentPath}">${part}</span>`;
+      }
+    });
+
+    breadcrumb.innerHTML = html;
+
+    breadcrumb.querySelectorAll('span[data-path]').forEach(span => {
+      span.addEventListener('click', () => {
+        this.navigateTo(span.dataset.path);
+      });
+    });
+  }
+
+  navigateTo(path) {
+    window.dispatchEvent(new CustomEvent('navigate-to-path', {
+      detail: { path }
+    }));
+  }
+
+  navigateUp() {
+    if (this.upBtn && this.upBtn.classList.contains('disabled')) return;
+    
+    const parts = this.currentPath.split('/').filter(p => p);
+    if (parts.length > 0) {
+      parts.pop();
+      const newPath = parts.length === 0 ? '/' : '/' + parts.join('/');
+      this.navigateTo(newPath);
+    }
+  }
+}
+
+customElements.define('directory-bar', DirectoryBar);

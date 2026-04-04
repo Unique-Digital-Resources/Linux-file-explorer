@@ -9,11 +9,10 @@ class StatusBar extends HTMLElement {
       // Status Group
       const statusGroup = document.createElement('div');
       statusGroup.className = 'status-group';
+      statusGroup.id = 'status-group';
       statusGroup.innerHTML = `
         <i class="mdi mdi-file-multiple"></i>
-        <span>9 Files</span>
-        <span>|</span>
-        <span>photo.jpg (1.2 MB) selected</span>
+        <span id="item-count">Loading...</span>
       `;
   
       // Settings Group
@@ -197,7 +196,61 @@ class StatusBar extends HTMLElement {
           icon.style.fontSize = `${iconSize}px`;
         });
       });
-  
+
+      // Listen for path changes to update item count
+      window.addEventListener('path-changed', (e) => {
+        if (window.AppState) window.AppState.currentPath = e.detail.path;
+        const itemCountEl = wrapper.querySelector('#item-count');
+        if (itemCountEl && window.SimulationAPI) {
+          const result = SimulationAPI.getFolderContents(e.detail.path);
+          if (!result.error) {
+            const count = result.items.length;
+            const folders = result.items.filter(i => i.type === 'folder').length;
+            const files = count - folders;
+            let text = '';
+            if (folders > 0 && files > 0) {
+              text = `${folders} folder${folders !== 1 ? 's' : ''}, ${files} file${files !== 1 ? 's' : ''}`;
+            } else if (folders > 0) {
+              text = `${folders} folder${folders !== 1 ? 's' : ''}`;
+            } else {
+              text = `${files} file${files !== 1 ? 's' : ''}`;
+            }
+            itemCountEl.textContent = text || '0 items';
+          }
+        }
+      });
+
+      // Listen for selection changes to update item count
+      window.addEventListener('selection-changed', (e) => {
+        const itemCountEl = wrapper.querySelector('#item-count');
+        if (itemCountEl) {
+          const count = e.detail.count;
+          if (count > 0) {
+            itemCountEl.textContent = `${count} item${count !== 1 ? 's' : ''} selected`;
+          } else {
+            // Restore normal count from path-changed
+            // Re-trigger path-changed to restore folder count
+            if (window.AppState && window.AppState.currentPath) {
+              const result = window.SimulationAPI.getFolderContents(window.AppState.currentPath);
+              if (!result.error) {
+                const total = result.items.length;
+                const folders = result.items.filter(i => i.type === 'folder').length;
+                const files = total - folders;
+                let text = '';
+                if (folders > 0 && files > 0) {
+                  text = `${folders} folder${folders !== 1 ? 's' : ''}, ${files} file${files !== 1 ? 's' : ''}`;
+                } else if (folders > 0) {
+                  text = `${folders} folder${folders !== 1 ? 's' : ''}`;
+                } else {
+                  text = `${files} file${files !== 1 ? 's' : ''}`;
+                }
+                itemCountEl.textContent = text || '0 items';
+              }
+            }
+          }
+        }
+      });
+
       // Layout styles
       const style = document.createElement('style');
       style.textContent = `

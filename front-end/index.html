@@ -11,34 +11,7 @@
 <body>
     <div class="container">
         <!-- Title Bar -->
-        <title-bar>
-            <!-- Tabs defined in main interface -->
-            <div class="tab first" draggable="true" data-index="0" slot="tabs">
-                <i class="mdi mdi-folder-outline"></i>
-                <span>Documents</span>
-                <i class="mdi mdi-close close"></i>
-            </div>
-            <div class="tab" draggable="true" data-index="1" slot="tabs">
-                <i class="mdi mdi-folder-outline"></i>
-                <span>Downloads</span>
-                <i class="mdi mdi-close close"></i>
-            </div>
-            <div class="tab" draggable="true" data-index="2" slot="tabs">
-                <i class="mdi mdi-folder-outline"></i>
-                <span>Images</span>
-                <i class="mdi mdi-close close"></i>
-            </div>
-            <div class="tab" draggable="true" data-index="3" slot="tabs">
-                <i class="mdi mdi-folder-outline"></i>
-                <span>Videos</span>
-                <i class="mdi mdi-close close"></i>
-            </div>
-            <div class="tab last" draggable="true" data-index="4" slot="tabs">
-                <i class="mdi mdi-folder-outline"></i>
-                <span>Projects</span>
-                <i class="mdi mdi-close close"></i>
-            </div>
-        </title-bar>
+        <title-bar></title-bar>
 
         <!-- Directory Bar -->
         <directory-bar></directory-bar>
@@ -46,144 +19,11 @@
         <!-- Content -->
         <div class="content">
             <panel-split>
-                <directories-panel slot="left">
-                    <!-- Main Directories Panel -->
-                    <div class="card main-dicts menu-panel" slot="content">
-                        <details open>
-                            <summary class="menu-panel-header">
-                                <i class="mdi mdi-chevron-right menu-panel-chevron"></i>
-                                <i class="mdi mdi-folder-multiple menu-panel-icon"></i>
-                                <span class="menu-panel-title">Main Directories</span>
-                            </summary>
-                            <div class="menu-panel-body">
-                                <div class="menu-panel-item" data-path="/Desktop">
-                                    <i class="mdi mdi-desktop-mac menu-panel-item-icon"></i>
-                                    <span class="menu-panel-item-label">Desktop</span>
-                                </div>
-                                <div class="menu-panel-item" data-path="/Downloads">
-                                    <i class="mdi mdi-download menu-panel-item-icon"></i>
-                                    <span class="menu-panel-item-label">Downloads</span>
-                                </div>
-                                <div class="menu-panel-item" data-path="/Documents">
-                                    <i class="mdi mdi-file-document menu-panel-item-icon"></i>
-                                    <span class="menu-panel-item-label">Documents</span>
-                                </div>
-                                <div class="menu-panel-item" data-path="/Images">
-                                    <i class="mdi mdi-image menu-panel-item-icon"></i>
-                                    <span class="menu-panel-item-label">Images</span>
-                                </div>
-                                <div class="menu-panel-item" data-path="/Sounds">
-                                    <i class="mdi mdi-music menu-panel-item-icon"></i>
-                                    <span class="menu-panel-item-label">Sounds</span>
-                                </div>
-                                <div class="menu-panel-item" data-path="/Videos">
-                                    <i class="mdi mdi-video menu-panel-item-icon"></i>
-                                    <span class="menu-panel-item-label">Videos</span>
-                                </div>
-                                <div class="menu-panel-item" data-path="/Network">
-                                    <i class="mdi mdi-network menu-panel-item-icon"></i>
-                                    <span class="menu-panel-item-label">Network</span>
-                                </div>
-                            </div>
-                        </details>
-                    </div>
-                    
-                    <!-- Favorites Panel -->
-                    <div class="card favorites-dicts menu-panel" slot="content">
-                        <details open>
-                            <summary class="menu-panel-header">
-                                <i class="mdi mdi-chevron-right menu-panel-chevron"></i>
-                                <i class="mdi mdi-star menu-panel-icon"></i>
-                                <span class="menu-panel-title">Favorites</span>
-                            </summary>
-                            <div class="menu-panel-body">
-                                <div class="menu-panel-item" data-path="/Work">
-                                    <i class="mdi mdi-folder-star menu-panel-item-icon"></i>
-                                    <span class="menu-panel-item-label">Work</span>
-                                </div>
-                                <div class="menu-panel-item" data-path="/Personal">
-                                    <i class="mdi mdi-folder-star menu-panel-item-icon"></i>
-                                    <span class="menu-panel-item-label">Personal</span>
-                                </div>
-                                <div class="menu-panel-item" data-path="/Projects">
-                                    <i class="mdi mdi-folder-star menu-panel-item-icon"></i>
-                                    <span class="menu-panel-item-label">Projects</span>
-                                </div>
-                            </div>
-                        </details>
-                    </div>
-                    
-                    <!-- Storage Drives Panel -->
-                    <div class="card drivers-card menu-panel" slot="content">
-                        <div class="menu-panel-header">
-                            <i class="mdi mdi-harddisk menu-panel-icon"></i>
-                            <span class="menu-panel-title">Storage Drives</span>
-                        </div>
-                        <div class="menu-panel-body">
-                            <div class="drivers-treemap">
-                                <div class="driver vertical" data-path="C:" style="grid-area: c;">
-                                    <i class="mdi mdi-harddisk"></i>
-                                    <span>C: (25%)</span>
-                                </div>
-                                <div class="driver horizontal" data-path="D:" style="grid-area: d;">
-                                    <i class="mdi mdi-harddisk"></i>
-                                    <span>D: (50%)</span>
-                                </div>
-                                <div class="driver horizontal" data-path="E:" style="grid-area: e;">
-                                    <i class="mdi mdi-harddisk"></i>
-                                    <span>E: (15%)</span>
-                                </div>
-                                <div class="driver horizontal" data-path="F:" style="grid-area: f;">
-                                    <i class="mdi mdi-harddisk"></i>
-                                    <span>F: (10%)</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Cloud Storage Panel -->
-                    <div class="card cloud-card menu-panel" slot="content">
-                        <div class="menu-panel-header">
-                            <i class="mdi mdi-cloud menu-panel-icon"></i>
-                            <span class="menu-panel-title">Cloud Storage</span>
-                        </div>
-                        <div class="menu-panel-body">
-                            <div class="cloud-item" data-path="gdrive">
-                                <i class="mdi mdi-google-drive menu-panel-item-icon"></i>
-                                <span class="menu-panel-item-label">Google Drive</span>
-                                <div class="progress"><div class="progress-bar" style="width: 60%;"></div></div>
-                            </div>
-                            <div class="cloud-item" data-path="onedrive">
-                                <i class="mdi mdi-microsoft-onedrive menu-panel-item-icon"></i>
-                                <span class="menu-panel-item-label">OneDrive</span>
-                                <div class="progress"><div class="progress-bar" style="width: 40%;"></div></div>
-                            </div>
-                            <div class="cloud-item" data-path="dropbox">
-                                <i class="mdi mdi-dropbox menu-panel-item-icon"></i>
-                                <span class="menu-panel-item-label">Dropbox</span>
-                                <div class="progress"><div class="progress-bar" style="width: 80%;"></div></div>
-                            </div>
-                        </div>
-                    </div>
-                </directories-panel>
-                
+                <directories-panel slot="left"></directories-panel>
                 <div class="main-panel" slot="right">
                     <tool-bar></tool-bar>
                     
-                    <folder-contents>
-                        <!-- File cards defined in main interface -->
-                        <file-card slot="files" name="ProjectX" icon="mdi-folder" type="folder"></file-card>
-                        <file-card slot="files" name="Lake View" icon="mdi-image" type="image" thumbnail="https://picsum.photos/seed/lake/600/400" width="600" height="400"></file-card>
-                        <file-card slot="files" name="City Tower" icon="mdi-image" type="image" thumbnail="https://picsum.photos/seed/city/400/600" width="400" height="600"></file-card>
-                        <file-card slot="files" name="Clip 01" icon="mdi-video" type="video" thumbnail="https://picsum.photos/seed/video1/640/360" width="640" height="360"></file-card>
-                        <file-card slot="files" name="script.py" icon="mdi-language-python" type="general"></file-card>
-                        <file-card slot="files" name="data.xlsx" icon="mdi-microsoft-excel" type="general"></file-card>
-                        <file-card slot="files" name="Abstract" icon="mdi-image" type="image" thumbnail="https://picsum.photos/seed/art/800/800" width="800" height="800"></file-card>
-                        <file-card slot="files" name="Archive.zip" icon="mdi-folder-zip" type="general"></file-card>
-                        <file-card slot="files" name="Panorama" icon="mdi-image" type="image" thumbnail="https://picsum.photos/seed/pano/800/300" width="800" height="300"></file-card>
-                        <file-card slot="files" name="report.docx" icon="mdi-file-word-box" type="general"></file-card>
-                        <file-card slot="files" name="Portrait" icon="mdi-image" type="image" thumbnail="https://picsum.photos/seed/person/300/500" width="300" height="500"></file-card>
-                    </folder-contents>
+                    <folder-contents></folder-contents>
                     
                     <status-bar></status-bar>
 
@@ -194,7 +34,9 @@
 
     <!-- Settings Panel -->
     <settings-panel></settings-panel>
+    <properties-dialog></properties-dialog>
 
+    <script src="../back-end/simulation.js"></script>
     <script src="sections/title-bar/title-bar.js"></script>
     <script src="sections/directory-bar/directory-bar.js"></script>
     <script src="sections/directories-panel/directories-panel.js"></script>
@@ -206,6 +48,7 @@
     <script type="module" src="sections/folder-contents/folder-contents.js"></script>
     
     <script src="sections/status-bar/status-bar.js"></script>
+    <script src="sections/properties/properties.js"></script>
 
 </body>
 </html>

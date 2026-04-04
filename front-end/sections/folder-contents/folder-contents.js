@@ -7,12 +7,17 @@ class FolderContents extends HTMLElement {
     this.currentMode = 'general';
     this.container = document.createElement('div');
     this.container.setAttribute('class', 'folder-contents');
+    this.currentPath = '/';
+    this.files = [];
     
     // Settings state
     this.gridGap = 16;
     this.fontSize = 13;
     this.iconSize = 16;
     this.appScale = 100;
+    
+    // Online image cache for consistent picsum images
+    this.imageCache = {};
 
     this.styleEl = document.createElement('style');
     this.linkEl = document.createElement('link');
@@ -52,66 +57,196 @@ class FolderContents extends HTMLElement {
       this.appScale = e.detail;
       this.render();
     });
+
+    // Listen for navigation events
+    window.addEventListener('navigate-to-path', (e) => {
+      this.loadFolder(e.detail.path);
+    });
+
+    // Listen for selection changes
+    window.addEventListener('selection-changed', () => {
+      this.updateCardSelections();
+    });
+
+    // Listen for sort changes
+    window.addEventListener('sort-changed', (e) => {
+      this.applySorting();
+      this.render();
+    });
+
+    // Listen for content refresh
+    window.addEventListener('refresh-contents', () => {
+      this.loadFolder(this.currentPath);
+    });
+
+    // Initial load
+    this.loadFolder('/');
+  }
+
+  getOnlineImageUrl(filename, width = 400, height = 400) {
+    const seed = filename.replace(/[^a-zA-Z0-9]/g, '');
+    if (!this.imageCache[filename]) {
+      this.imageCache[filename] = `https://picsum.photos/seed/${seed}/${width}/${height}`;
+    }
+    return this.imageCache[filename];
+  }
+
+  loadFolder(path) {
+    if (!window.SimulationAPI) {
+      console.error('SimulationAPI not found');
+      return;
+    }
+
+    this.currentPath = path;
+    if (window.AppState) {
+      window.AppState.deselectAll();
+    }
+    const result = SimulationAPI.getFolderContents(path);
+    
+    if (result.error) {
+      console.error('Error loading folder:', result.error);
+      this.files = [];
+    } else {
+      this.files = result.items.map(item => {
+        if (item.type === 'image') {
+          return {
+            ...item,
+            url: this.getOnlineImageUrl(item.name, item.w || 400, item.h || 400)
+          };
+        }
+        return item;
+      });
+      this.applySorting();
+    }
+
+    // Update directory bar
+    window.dispatchEvent(new CustomEvent('path-changed', {
+      detail: { path: path, name: result.name || path, itemCount: this.files.length }
+    }));
+
+    this.render();
   }
 
   connectedCallback() {
     this.render();
     this.shadowRoot.append(this.styleEl, this.linkEl, this.container);
-    
-    // Watch for slot changes
-    const slot = this.querySelector('[slot="files"]');
-    if (slot) {
-      const observer = new MutationObserver(() => this.render());
-      observer.observe(this, { childList: true, subtree: true });
-    }
-  }
-
-  // Get file data from slotted file-card elements
-  getFilesFromSlot() {
-    const fileCards = this.querySelectorAll('file-card[slot="files"]');
-    return Array.from(fileCards).map(card => ({
-      name: card.getAttribute('name') || 'Unknown',
-      icon: card.getAttribute('icon') || 'mdi-file',
-      type: card.getAttribute('type') || 'general',
-      url: card.getAttribute('thumbnail') || null,
-      w: parseInt(card.getAttribute('width')) || 100,
-      h: parseInt(card.getAttribute('height')) || 100
-    }));
   }
 
   createCard(file, extraClasses = '') {
     const card = document.createElement('file-card');
     card.setAttribute('name', file.name);
     card.setAttribute('icon', file.icon);
+    card.setAttribute('data-path', file.path);
+    card.setAttribute('data-type', file.type);
     if (file.url) card.setAttribute('thumbnail', file.url);
+    if (file.w) card.setAttribute('data-w', file.w);
+    if (file.h) card.setAttribute('data-h', file.h);
     if (extraClasses) card.classList.add(...extraClasses.split(' '));
+    
+    // Selection state
+    if (window.AppState && window.AppState.isSelected(file.path)) {
+      card.setAttribute('selected', '');
+    }
+    
+    // Single click: select item
+    card.addEventListener('click', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        // Ctrl/Cmd+Click: toggle selection
+        if (window.AppState) {
+          window.AppState.toggleSelection(file);
+          this.updateCardSelections();
+        }
+      } else if (e.shiftKey && window.AppState && window.AppState.selectedItems.length > 0) {
+        // Shift+Click: range selection
+        this.handleRangeSelect(file);
+      } else {
+        // Normal click: select only this item (no navigation)
+        if (window.AppState) {
+          window.AppState.deselectAll();
+          window.AppState.selectItem(file);
+          this.updateCardSelections();
+        }
+      }
+    });
+
+    // Double click: navigate into folder or open file
+    card.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      if (file.type === 'folder') {
+        window.dispatchEvent(new CustomEvent('navigate-to-path', {
+          detail: { path: file.path }
+        }));
+      }
+    });
+    
     return card;
+  }
+
+  handleRangeSelect(targetFile) {
+    if (!window.AppState) return;
+    const startPath = window.AppState.selectedItems[window.AppState.selectedItems.length - 1]?.path;
+    if (!startPath) {
+      window.AppState.selectItem(targetFile);
+      this.updateCardSelections();
+      return;
+    }
+    
+    const startIndex = this.files.findIndex(f => f.path === startPath);
+    const endIndex = this.files.findIndex(f => f.path === targetFile.path);
+    if (startIndex === -1 || endIndex === -1) return;
+    
+    const from = Math.min(startIndex, endIndex);
+    const to = Math.max(startIndex, endIndex);
+    
+    window.AppState.deselectAll();
+    for (let i = from; i <= to; i++) {
+      window.AppState.selectItem(this.files[i]);
+    }
+    this.updateCardSelections();
+  }
+
+  updateCardSelections() {
+    const cards = this.container.querySelectorAll('file-card');
+    cards.forEach(card => {
+      const path = card.getAttribute('data-path');
+      if (window.AppState && window.AppState.isSelected(path)) {
+        card.setAttribute('selected', '');
+      } else {
+        card.removeAttribute('selected');
+      }
+    });
+  }
+
+  applySorting() {
+    if (!window.AppState) return;
+    const by = window.AppState.currentSort;
+    const dir = window.AppState.sortDirection === 'asc' ? 1 : -1;
+    
+    this.files.sort((a, b) => {
+      // Always keep folders first
+      if (a.type === 'folder' && b.type !== 'folder') return -1;
+      if (a.type !== 'folder' && b.type === 'folder') return 1;
+      
+      switch (by) {
+        case 'name':
+          return dir * a.name.localeCompare(b.name);
+        case 'date':
+          const dateA = a.modified ? new Date(a.modified).getTime() : 0;
+          const dateB = b.modified ? new Date(b.modified).getTime() : 0;
+          return dir * (dateA - dateB);
+        case 'size':
+          return dir * ((a.size || 0) - (b.size || 0));
+        case 'type':
+          return dir * a.type.localeCompare(b.type);
+        default:
+          return dir * a.name.localeCompare(b.name);
+      }
+    });
   }
 
   render() {
     this.container.innerHTML = '';
     let css = '';
-
-    // Get files from slot or use empty array
-    const files = this.getFilesFromSlot();
-    
-    // If no files in slot, check for light DOM content
-    if (files.length === 0) {
-      // Try to get files from light DOM file-card elements
-      const lightDomFiles = this.querySelectorAll('file-card');
-      if (lightDomFiles.length > 0) {
-        lightDomFiles.forEach(card => {
-          files.push({
-            name: card.getAttribute('name') || 'Unknown',
-            icon: card.getAttribute('icon') || 'mdi-file',
-            type: card.getAttribute('type') || 'general',
-            url: card.getAttribute('thumbnail') || null,
-            w: parseInt(card.getAttribute('width')) || 100,
-            h: parseInt(card.getAttribute('height')) || 100
-          });
-        });
-      }
-    }
 
     // Calculate zoom level (default 100%)
     const zoomLevel = this.zoomLevel || 100;
@@ -153,7 +288,7 @@ class FolderContents extends HTMLElement {
         .file-card.is-visual { background-size: cover !important; background-position: center !important; }
       `;
       
-      const visualFiles = files.filter(f => f.type === 'image' || f.type === 'video');
+      const visualFiles = this.files.filter(f => f.type === 'image' || f.type === 'video');
       visualFiles.forEach(file => {
         const ratio = file.w / file.h;
         let extraClass = '';
@@ -205,8 +340,8 @@ class FolderContents extends HTMLElement {
         }
       `;
 
-      const visualFiles = files.filter(f => f.type === 'image' || f.type === 'video');
-      const generalFiles = files.filter(f => f.type !== 'image' && f.type !== 'video');
+      const visualFiles = this.files.filter(f => f.type === 'image' || f.type === 'video');
+      const generalFiles = this.files.filter(f => f.type !== 'image' && f.type !== 'video');
 
       const visualsGroup = document.createElement('div');
       visualsGroup.className = 'type-group';
@@ -252,7 +387,7 @@ class FolderContents extends HTMLElement {
           file-card { width: 100% !important; height: 100% !important; }
         }
       `;
-      files.forEach(file => {
+      this.files.forEach(file => {
         this.container.appendChild(this.createCard(file));
       });
     }

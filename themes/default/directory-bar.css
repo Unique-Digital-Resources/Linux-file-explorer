@@ -171,3 +171,53 @@
   font-size: 16px;
   color: #6c757d;
 }
+
+/* Disabled state for navigation buttons */
+.dirct-move i.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Path bar text edit mode */
+.dirct-path.path-edit-mode {
+  padding: 0;
+}
+
+.dirct-path.path-edit-mode .breadcrumb-path,
+.dirct-path.path-edit-mode > i {
+  display: none;
+}
+
+.dirct-path.path-edit-mode .path-edit-input {
+  display: block;
+}
+
+.path-edit-input {
+  display: none;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: var(--card-bg);
+  color: var(--text-color);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 0 12px;
+  outline: none;
+  border-radius: 6px;
+}
+
+/* Error state for invalid path */
+.dirct-path.path-error {
+  background: #dc3545 !important;
+  transition: background 0.15s ease;
+}
+
+.dirct-path.path-error .path-edit-input {
+  background: #dc3545;
+  color: white;
+}
+
+.dirct-path.path-error .path-edit-input::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+}

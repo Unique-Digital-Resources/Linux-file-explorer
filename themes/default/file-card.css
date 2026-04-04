@@ -87,8 +87,24 @@
   padding: 0 4px;
 }
 
+.file-card .name .filename {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: calc(100% - 30px);
+}
+
+.file-card .name .fileext {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #6c757d;
+  font-size: 10px;
+}
+
 .file-card .name i {
   font-size: 10px;
+  flex-shrink: 0;
 }
 
 /* --- VISUAL CARD SPECIFIC STYLES --- */
