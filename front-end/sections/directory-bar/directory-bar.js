@@ -21,11 +21,6 @@ class DirectoryBar extends HTMLElement {
           <input type="text" class="path-edit-input" id="path-edit-input" spellcheck="false">
           <i class="mdi mdi-folder-plus clip-text" title="Copy folder path"></i>
         </div>
-        <div class="search-box">
-          <i class="mdi mdi-magnify" id="search-icon"></i>
-          <input type="text" placeholder="Search" id="search-input">
-        </div>
-        <div class="search-results" id="search-results" hidden></div>
       </div>
     `;
 
@@ -49,61 +44,6 @@ class DirectoryBar extends HTMLElement {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-      }
-      .search-results {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: var(--card-bg, white);
-        border: 1px solid var(--border-color, #ccc);
-        border-radius: 4px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        max-height: 300px;
-        overflow-y: auto;
-        z-index: 1000;
-        margin-top: 2px;
-      }
-      .search-result-item {
-        padding: 8px 12px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 13px;
-        color: var(--text-color, #333);
-      }
-      .search-result-item:hover {
-        background: var(--hover-bg, #f0f0f0);
-      }
-      .search-result-item i {
-        font-size: 16px;
-        flex-shrink: 0;
-      }
-      .search-result-item .result-info {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
-      .search-result-item .result-name {
-        font-weight: 500;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      .search-result-item .result-path {
-        font-size: 11px;
-        opacity: 0.6;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      .no-results {
-        padding: 12px;
-        text-align: center;
-        color: var(--text-color, #666);
-        opacity: 0.6;
-        font-size: 13px;
       }
       .dirct-move i.disabled {
         opacity: 0.3;
@@ -141,7 +81,6 @@ class DirectoryBar extends HTMLElement {
     this.shadowRoot.appendChild(style);
 
     this.initNavigation();
-    this.initSearch();
     this.initPathListener();
     this.initPathEdit();
   }
@@ -184,82 +123,6 @@ class DirectoryBar extends HTMLElement {
         detail: { path: this.currentPath }
       }));
     });
-  }
-
-  initSearch() {
-    const searchInput = this.shadowRoot.getElementById('search-input');
-    const searchIcon = this.shadowRoot.getElementById('search-icon');
-    const searchResults = this.shadowRoot.getElementById('search-results');
-
-    const performSearch = () => {
-      const query = searchInput.value.trim();
-      if (query.length < 1) {
-        searchResults.hidden = true;
-        return;
-      }
-      if (typeof window.SimulationAPI?.searchFiles === 'function') {
-        const results = window.SimulationAPI.searchFiles(query, this.currentPath);
-        this.renderSearchResults(results);
-      }
-    };
-
-    searchIcon?.addEventListener('click', performSearch);
-
-    searchInput?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        performSearch();
-      } else if (e.key === 'Escape') {
-        searchResults.hidden = true;
-      }
-    });
-
-    searchInput?.addEventListener('input', () => {
-      if (searchInput.value.trim() === '') {
-        searchResults.hidden = true;
-      }
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!this.shadowRoot.contains(e.target)) {
-        searchResults.hidden = true;
-      }
-    });
-  }
-
-  renderSearchResults(results) {
-    const searchResults = this.shadowRoot.getElementById('search-results');
-    searchResults.innerHTML = '';
-
-    if (!results || results.length === 0) {
-      searchResults.innerHTML = '<div class="no-results">No results found</div>';
-      searchResults.hidden = false;
-      return;
-    }
-
-    results.forEach((result) => {
-      const item = document.createElement('div');
-      item.className = 'search-result-item';
-
-      const iconClass = result.type === 'folder' ? 'mdi-folder' : 'mdi-file-document';
-      const parentPath = result.path.substring(0, result.path.lastIndexOf('/')) || '/';
-
-      item.innerHTML = `
-        <i class="mdi ${iconClass}"></i>
-        <div class="result-info">
-          <span class="result-name">${result.name}</span>
-          <span class="result-path">${result.path}</span>
-        </div>
-      `;
-
-      item.addEventListener('click', () => {
-        searchResults.hidden = true;
-        this.navigateTo(parentPath);
-      });
-
-      searchResults.appendChild(item);
-    });
-
-    searchResults.hidden = false;
   }
 
   initPathListener() {

@@ -14,7 +14,14 @@ class TitleBar extends HTMLElement {
     // Tab state
     this.nextTabId = 2;
     this.tabs = [
-      { id: 'tab-1', path: '/C:/home', history: ['/C:/home'], historyIndex: 0, name: 'Home' }
+      { 
+        id: 'tab-1', 
+        path: '/C:/home', 
+        history: ['/C:/home'], 
+        historyIndex: 0, 
+        name: 'Home',
+        filters: { extension: null, tags: [], colors: [], search: '' }
+      }
     ];
     this.activeTabId = 'tab-1';
 
@@ -471,7 +478,13 @@ class TitleBar extends HTMLElement {
     if (!tab || tab.id === this.activeTabId) return;
 
     this.activeTabId = tabId;
+    // Sync filters from this tab to AppState (without dispatching filter-changed)
+    if (window.AppState) {
+      window.AppState.filters = { ...tab.filters };
+    }
     this.renderTabs();
+    // Notify UI components (toolbar) that active tab changed (filters may have changed)
+    window.dispatchEvent(new CustomEvent('active-tab-changed'));
     window.dispatchEvent(new CustomEvent('navigate-to-path', { detail: { path: tab.path } }));
     this.dispatchNavigationState();
   }
@@ -501,7 +514,14 @@ class TitleBar extends HTMLElement {
       let newIndex = index;
       if (newIndex >= this.tabs.length) newIndex = this.tabs.length - 1;
       this.activeTabId = this.tabs[newIndex].id;
+      // Sync filters from the new active tab to AppState (without dispatching filter-changed)
+      if (window.AppState) {
+        const newActiveTab = this.tabs[newIndex];
+        window.AppState.filters = { ...newActiveTab.filters };
+      }
       this.renderTabs();
+      // Notify UI components that active tab changed
+      window.dispatchEvent(new CustomEvent('active-tab-changed'));
       window.dispatchEvent(new CustomEvent('navigate-to-path', { detail: { path: this.tabs[newIndex].path } }));
     } else {
       this.renderTabs();
@@ -516,11 +536,18 @@ class TitleBar extends HTMLElement {
       path: homePath,
       history: [homePath],
       historyIndex: 0,
-      name: 'Home'
+      name: 'Home',
+      filters: { extension: null, tags: [], colors: [], search: '' }
     };
     this.tabs.push(newTab);
     this.activeTabId = newTab.id;
+    // Sync new tab's filters to AppState (without dispatching filter-changed)
+    if (window.AppState) {
+      window.AppState.filters = { ...newTab.filters };
+    }
     this.renderTabs();
+    // Notify UI components that active tab changed
+    window.dispatchEvent(new CustomEvent('active-tab-changed'));
     window.dispatchEvent(new CustomEvent('navigate-to-path', { detail: { path: homePath } }));
     window.dispatchEvent(new CustomEvent('path-changed', { detail: { path: homePath, name: 'Home' } }));
     this.dispatchNavigationState();

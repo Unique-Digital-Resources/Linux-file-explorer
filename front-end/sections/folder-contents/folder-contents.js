@@ -74,6 +74,11 @@ class FolderContents extends HTMLElement {
       this.render();
     });
 
+    // Listen for filter changes
+    window.addEventListener('filter-changed', () => {
+      this.loadFolder(this.currentPath);
+    });
+
     // Listen for content refresh
     window.addEventListener('refresh-contents', () => {
       this.loadFolder(this.currentPath);
@@ -101,7 +106,8 @@ class FolderContents extends HTMLElement {
     if (window.AppState) {
       window.AppState.deselectAll();
     }
-    const result = SimulationAPI.getFolderContents(path);
+    const filters = window.AppState ? window.AppState.filters : {};
+    const result = SimulationAPI.getFolderContents(path, filters);
     
     if (result.error) {
       console.error('Error loading folder:', result.error);

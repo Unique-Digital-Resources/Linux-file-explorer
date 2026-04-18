@@ -5,7 +5,7 @@
   border-bottom: 1px solid var(--border-color);
 }
 
-.dirct-move, .dirct-path, .search-box {
+.dirct-move, .dirct-path {
   height: 34px;
   display: flex;
   align-items: center;
@@ -146,30 +146,6 @@
 .dirct-path > i.clip-text:hover {
   background: #28a745;
   color: white;
-}
-
-.search-box {
-  gap: 8px;
-  padding: 0 12px;
-  min-width: 200px;
-}
-
-.search-box input {
-  border: none;
-  background: none;
-  outline: none;
-  color: var(--text-color);
-  flex: 1;
-  font-size: 14px;
-}
-
-.search-box input::placeholder {
-  color: #6c757d;
-}
-
-.search-box i {
-  font-size: 16px;
-  color: #6c757d;
 }
 
 /* Disabled state for navigation buttons */

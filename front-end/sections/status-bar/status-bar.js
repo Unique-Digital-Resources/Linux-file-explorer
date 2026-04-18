@@ -202,7 +202,8 @@ class StatusBar extends HTMLElement {
         if (window.AppState) window.AppState.currentPath = e.detail.path;
         const itemCountEl = wrapper.querySelector('#item-count');
         if (itemCountEl && window.SimulationAPI) {
-          const result = SimulationAPI.getFolderContents(e.detail.path);
+          const filters = window.AppState ? window.AppState.filters : {};
+          const result = SimulationAPI.getFolderContents(e.detail.path, filters);
           if (!result.error) {
             const count = result.items.length;
             const folders = result.items.filter(i => i.type === 'folder').length;
@@ -229,9 +230,10 @@ class StatusBar extends HTMLElement {
             itemCountEl.textContent = `${count} item${count !== 1 ? 's' : ''} selected`;
           } else {
             // Restore normal count from path-changed
-            // Re-trigger path-changed to restore folder count
+            // Re-fetch with current filters
             if (window.AppState && window.AppState.currentPath) {
-              const result = window.SimulationAPI.getFolderContents(window.AppState.currentPath);
+              const filters = window.AppState.filters;
+              const result = window.SimulationAPI.getFolderContents(window.AppState.currentPath, filters);
               if (!result.error) {
                 const total = result.items.length;
                 const folders = result.items.filter(i => i.type === 'folder').length;

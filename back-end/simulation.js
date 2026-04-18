@@ -336,6 +336,82 @@ const FileSystem = {
     }
 };
 
+// ---------------- Tags & Colors enrichment ----------------
+const TAGS_POOL = ['important','work','personal','archived','draft','shared','reference','todo','code','media','document'];
+const COLOR_MAP = {
+    'important': '#ef4444',
+    'work': '#3b82f6',
+    'personal': '#22c55e',
+    'archived': '#6b7280',
+    'draft': '#f59e0b',
+    'shared': '#8b5cf6',
+    'reference': '#06b6d4',
+    'todo': '#f97316',
+    'code': '#14b8a6',
+    'media': '#a855f7',
+    'document': '#eab308'
+};
+
+function enrichNode(node, path) {
+    const tags = [];
+    let color = null;
+
+    const lowerPath = path.toLowerCase();
+    const ext = getFileExtension(node.name);
+
+    // Heuristic tagging based on location and type
+    if (lowerPath.includes('home/desktop') || lowerPath.includes('home/documents') || lowerPath.includes('home/downloads')) {
+        tags.push('personal');
+    }
+    if (lowerPath.includes('home/documents') || lowerPath.includes('program files') || lowerPath.includes('windows') || lowerPath.includes('projects')) {
+        tags.push('work');
+    }
+    if (lowerPath.includes('downloads')) {
+        tags.push('draft');
+    }
+    if (lowerPath.includes('images') || lowerPath.includes('sounds') || lowerPath.includes('videos') || lowerPath.includes('media')) {
+        tags.push('media');
+    }
+    const codeExts = ['py','js','html','css','json','ts','java','cpp','c','h','sh'];
+    if (codeExts.includes(ext)) {
+        tags.push('code');
+    }
+    const docExts = ['pdf','doc','docx','txt','xlsx','xls','csv','ods','rtf','odt'];
+    if (docExts.includes(ext)) {
+        tags.push('document');
+    }
+
+    const importantFiles = ['readme.txt','resume.docx','tax-return-2023.pdf','service-agreement.pdf','project-plan.docx','team-roster.xlsx'];
+    if (importantFiles.some(f => lowerPath.includes(f))) {
+        tags.push('important');
+    }
+
+    if (lowerPath.includes('google drive') || lowerPath.includes('shared') || lowerPath.includes('dropbox') || lowerPath.includes('onedrive')) {
+        tags.push('shared');
+    }
+
+    node.tags = [...new Set(tags)];
+
+    // Assign color based on first matching tag
+    for (const t of node.tags) {
+        if (COLOR_MAP[t]) {
+            node.color = COLOR_MAP[t];
+            break;
+        }
+    }
+
+    // Recurse
+    if (node.children) {
+        for (const [name, child] of Object.entries(node.children)) {
+            const childPath = path === '/' ? `/${name}` : `${path}/${name}`;
+            enrichNode(child, childPath);
+        }
+    }
+}
+
+// Enrich the entire file system
+enrichNode(FileSystem['/'], '/');
+
 const FileIcons = {
     folder: "mdi-folder",
     image: "mdi-image",
@@ -429,7 +505,7 @@ const SimulationAPI = {
         return directories;
     },
     
-    getFolderContents(path) {
+    getFolderContents(path, filters = {}) {
         const folder = resolvePath(path);
         
         if (!folder) {
@@ -440,7 +516,7 @@ const SimulationAPI = {
             return { error: "Not a folder", items: [] };
         }
         
-        const items = [];
+        let items = [];
         
         for (const [name, node] of Object.entries(folder.children)) {
             const item = {
@@ -449,7 +525,9 @@ const SimulationAPI = {
                 icon: getFileIcon(node.type),
                 path: path === '/' ? `/${name}` : `${path}/${name}`,
                 size: node.size || 0,
-                modified: node.modified || null
+                modified: node.modified || null,
+                tags: node.tags || [],
+                color: node.color || null
             };
             
             if (node.type === 'image' && node.dimensions) {
@@ -460,6 +538,25 @@ const SimulationAPI = {
             }
             
             items.push(item);
+        }
+        
+        // Apply filters
+        if (filters.extension) {
+            const ext = filters.extension.toLowerCase();
+            items = items.filter(item => item.name.toLowerCase().endsWith(ext));
+        }
+        if (filters.tags && filters.tags.length > 0) {
+            items = items.filter(item => (item.tags || []).some(tag => filters.tags.includes(tag)));
+        }
+        if (filters.colors && filters.colors.length > 0) {
+            items = items.filter(item => {
+                if (filters.colors.includes('none') && !item.color) return true;
+                return filters.colors.includes(item.color);
+            });
+        }
+        if (filters.search) {
+            const q = filters.search.toLowerCase();
+            items = items.filter(item => item.name.toLowerCase().includes(q));
         }
         
         items.sort((a, b) => {
@@ -489,7 +586,9 @@ const SimulationAPI = {
             icon: getFileIcon(file.type),
             path: path,
             size: file.size || 0,
-            modified: file.modified || null
+            modified: file.modified || null,
+            tags: file.tags || [],
+            color: file.color || null
         };
         
         if (file.type === 'image' && file.dimensions) {
@@ -704,6 +803,12 @@ const AppState = {
     currentPath: '/',
     currentSort: 'name',    // 'name', 'date', 'size', 'type'
     sortDirection: 'asc',   // 'asc' or 'desc'
+    filters: {
+        extension: null,
+        tags: [],
+        colors: [],
+        search: ''
+    },
     
     // Selection methods
     selectItem(item) {
@@ -767,7 +872,50 @@ const AppState = {
         this.sortDirection = direction;
         window.dispatchEvent(new CustomEvent('sort-changed', { detail: { by, direction } }));
     },
-    
+
+    // Filter methods
+    setFilter(type, value) {
+      if (this.filters.hasOwnProperty(type)) {
+        this.filters[type] = value;
+        // Update active tab's filters if tab system exists
+        const titleBar = document.querySelector('title-bar');
+        if (titleBar && titleBar.activeTabId) {
+          const tab = titleBar.tabs.find(t => t.id === titleBar.activeTabId);
+          if (tab) {
+            if (!tab.filters) tab.filters = { extension: null, tags: [], colors: [], search: '' };
+            tab.filters[type] = value;
+          }
+        }
+        this.dispatchFilterChanged();
+      }
+    },
+    setFilters(updates) {
+      Object.assign(this.filters, updates);
+      // Update active tab's filters if tab system exists
+      const titleBar = document.querySelector('title-bar');
+      if (titleBar && titleBar.activeTabId) {
+        const tab = titleBar.tabs.find(t => t.id === titleBar.activeTabId);
+        if (tab) {
+          if (!tab.filters) tab.filters = { extension: null, tags: [], colors: [], search: '' };
+          Object.assign(tab.filters, updates);
+        }
+      }
+      this.dispatchFilterChanged();
+    },
+    clearFilters() {
+      const cleared = { extension: null, tags: [], colors: [], search: '' };
+      this.filters = cleared;
+      // Update active tab's filters if tab system exists
+      const titleBar = document.querySelector('title-bar');
+      if (titleBar && titleBar.activeTabId) {
+        const tab = titleBar.tabs.find(t => t.id === titleBar.activeTabId);
+        if (tab) {
+          tab.filters = { extension: null, tags: [], colors: [], search: '' };
+        }
+      }
+      this.dispatchFilterChanged();
+    },
+
     // Events
     dispatchSelectionChanged() {
         window.dispatchEvent(new CustomEvent('selection-changed', { 
@@ -778,6 +926,12 @@ const AppState = {
     dispatchClipboardChanged() {
         window.dispatchEvent(new CustomEvent('clipboard-changed', { 
             detail: { clipboard: this.clipboard } 
+        }));
+    },
+
+    dispatchFilterChanged() {
+        window.dispatchEvent(new CustomEvent('filter-changed', {
+            detail: { filters: this.filters }
         }));
     }
 };
